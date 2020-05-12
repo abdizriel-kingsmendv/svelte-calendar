@@ -2,7 +2,7 @@
   import Month from './Month.svelte';
   import NavBar from './NavBar.svelte';
   import Popover from './Popover.svelte';
-  import { getMonths } from './lib/helpers';
+  import { getMonths, getYears } from './lib/helpers';
   import { formatDate, internationalize } from 'timeUtils';
   import { keyCodes, keyCodesArray } from './lib/keyCodes';
   import { onMount, createEventDispatcher } from 'svelte';
@@ -45,7 +45,7 @@
   ];
 
   export let style = '';
-  
+
   // theming variables:
   export let buttonBackgroundColor = '#fff';
   export let buttonBorderColor = '#eee';
@@ -80,6 +80,7 @@
   }
 
   $: months = getMonths(start, end, selectableCallback, weekStart);
+  $: years = getYears(start, end, selectableCallback, weekStart);
 
   let monthIndex = 0;
   $: {
@@ -124,6 +125,11 @@
   function changeMonth(selectedMonth) {
     month = selectedMonth;
     highlighted = new Date(year, month, 1);
+  }
+
+  function changeYear(selectedYear){
+      year = selectedYear;
+      highlighted = new Date(year, month, 1);
   }
 
   function incrementMonth(direction, day = 1) {
@@ -253,9 +259,9 @@
 
 </script>
 
-<div 
-  class="datepicker" 
-  class:open="{isOpen}" 
+<div
+  class="datepicker"
+  class:open="{isOpen}"
   class:closing="{isClosing}"
   style={wrapperStyle}
 >
@@ -278,7 +284,7 @@
     </div>
     <div slot="contents">
       <div class="calendar">
-        <NavBar 
+        <NavBar
           {month}
           {year}
           {canIncrementMonth}
@@ -286,21 +292,23 @@
           {start}
           {end}
           {monthsOfYear}
+          calendarYears={years}
           on:monthSelected={e => changeMonth(e.detail)}
-          on:incrementMonth={e => incrementMonth(e.detail)} 
+          on:yearSelected={e => changeYear(e.detail)}
+          on:incrementMonth={e => incrementMonth(e.detail)}
         />
         <div class="legend">
           {#each sortedDaysOfWeek as day}
           <span>{day[1]}</span>
           {/each}
         </div>
-        <Month 
+        <Month
           {visibleMonth}
           {selected}
           {highlighted}
           {shouldShakeDate}
           id={visibleMonthId}
-          on:dateSelected={e => registerSelection(e.detail)} 
+          on:dateSelected={e => registerSelection(e.detail)}
         />
       </div>
     </div>
